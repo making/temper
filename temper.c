@@ -13,46 +13,46 @@ static float scale = 1.0287;
 static float offset = -0.85;
 
 int main(){
-	int passes = 0;
-	float tempc = 0.0000;
-	do {
-		usb_dev_handle* lvr_winusb = pcsensor_open();
+  int passes = 0;
+  float tempc = 0.0000;
+  do {
+    usb_dev_handle* lvr_winusb = pcsensor_open();
 
-		if (!lvr_winusb) {
-			/* Open fails sometime, sleep and try again */
-			sleep(3);
-		}
-		else {
+    if (!lvr_winusb) {
+      /* Open fails sometime, sleep and try again */
+      sleep(3);
+    }
+    else {
 	
-			tempc = pcsensor_get_temperature(lvr_winusb);
-			pcsensor_close(lvr_winusb);
-		}
-		++passes;
-	}
-	/* Read fails silently with a 0.0 return, so repeat until not zero
-	   or until we have read the same zero value 3 times (just in case
-	   temp is really dead on zero */
-	while ((tempc > -0.0001 && tempc < 0.0001) || passes >= 4);
+      tempc = pcsensor_get_temperature(lvr_winusb);
+      pcsensor_close(lvr_winusb);
+    }
+    ++passes;
+  }
+  /* Read fails silently with a 0.0 return, so repeat until not zero
+     or until we have read the same zero value 3 times (just in case
+     temp is really dead on zero */
+  while ((tempc > -0.0001 && tempc < 0.0001) || passes >= 4);
 
-	if (!((tempc > -0.0001 && tempc < 0.0001) || passes >= 4)) {
-		/* Apply calibrations */
-		tempc = (tempc * scale) + offset;
+  if (!((tempc > -0.0001 && tempc < 0.0001) || passes >= 4)) {
+    /* Apply calibrations */
+    tempc = (tempc * scale) + offset;
 
-		struct tm *utc;
-		time_t t;
-		t = time(NULL);
-		utc = gmtime(&t);
+    struct tm *utc;
+    time_t t;
+    t = time(NULL);
+    utc = gmtime(&t);
 		
-		char dt[80];
-		strftime(dt, 80, "%Y-%m-%dT%H:%M:%SZ", utc);
+    char dt[80];
+    strftime(dt, 80, "%Y-%m-%dT%H:%M:%SZ", utc);
 
-		printf("{\"datetime\":\"%s\", \"temper\":%f}\n", dt, tempc);
-		fflush(stdout);
+    printf("{\"datetime\":\"%s\", \"temper\":%f}\n", dt, tempc);
+    fflush(stdout);
 
-		return 0;
-	}
-	else {
-		return 1;
-	}
+    return 0;
+  }
+  else {
+    return 1;
+  }
 
 }
