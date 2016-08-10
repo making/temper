@@ -44,9 +44,9 @@ int main(){
 		utc = gmtime(&t);
 		
 		char dt[80];
-		strftime(dt, 80, "%d-%b-%Y %H:%M", utc);
+		strftime(dt, 80, "%Y-%m-%dT%H:%M:%SZ", utc);
 
-		printf("%s,%f\n", dt, tempc);
+		printf("{\"datetime\":\"%s\", \"temper\":%f}\n", dt, tempc);
 		fflush(stdout);
 
 		return 0;
